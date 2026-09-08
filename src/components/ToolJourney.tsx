@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, KeyboardEvent } from 'react';
 
 type Stage = { title: string; detail: string; codeHtml: string };
 
@@ -7,6 +7,20 @@ type Props = { stages: Stage[] };
 export default function ToolJourney({ stages }: Props) {
   const [active, setActive] = useState(0);
   const stage = useMemo(() => stages[active], [active, stages]);
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLButtonElement>, i: number) => {
+    let nextIndex = i;
+    if (e.key === 'ArrowRight') {
+      nextIndex = (i + 1) % stages.length;
+    } else if (e.key === 'ArrowLeft') {
+      nextIndex = (i - 1 + stages.length) % stages.length;
+    }
+
+    if (nextIndex !== i) {
+      setActive(nextIndex);
+      document.getElementById(`journey-tab-${nextIndex}`)?.focus();
+    }
+  };
 
   return (
     <div className="card">
@@ -18,7 +32,9 @@ export default function ToolJourney({ stages }: Props) {
             aria-selected={i === active}
             aria-controls="journey-tabpanel"
             id={`journey-tab-${i}`}
+            tabIndex={i === active ? 0 : -1}
             onClick={() => setActive(i)}
+            onKeyDown={(e) => handleKeyDown(e, i)}
             style={{
               padding: '1rem',
               borderRadius: '1rem',
