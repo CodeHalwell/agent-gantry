@@ -28,7 +28,10 @@ class AgentSkill(BaseModel):
 
     model_config = ConfigDict(extra="ignore", validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("id", "name")(reject_newlines)
+    @field_validator("id", "name")
+    @classmethod
+    def _validate_newlines(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
 
 class AgentCard(BaseModel):
@@ -49,7 +52,10 @@ class AgentCard(BaseModel):
 
     model_config = ConfigDict(extra="ignore", validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("name")(reject_newlines)
+    @field_validator("name")
+    @classmethod
+    def _validate_newlines(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
     authentication: dict[str, Any] | None = Field(
         default=None, description="Authentication configuration"
@@ -58,6 +64,7 @@ class AgentCard(BaseModel):
 
 
 class TaskMessagePart(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """A part of a task message."""
 
     type: str = Field(default="text", description="Message part type")
@@ -66,6 +73,7 @@ class TaskMessagePart(BaseModel):
 
 
 class TaskMessage(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """A message in a task request."""
 
     role: str = Field(..., description="Role (e.g., 'user', 'assistant')")
@@ -79,8 +87,16 @@ class TaskRequest(BaseModel):
     messages: list[TaskMessage] = Field(default_factory=list, description="Conversation messages")
     metadata: dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
+    model_config = ConfigDict(validate_assignment=True)
+
+    @field_validator("skill_id")
+    @classmethod
+    def _validate_newlines(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
+
 
 class TaskResponse(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """Response from an A2A agent task execution."""
 
     status: str = Field(..., description="Status (success, error, etc.)")

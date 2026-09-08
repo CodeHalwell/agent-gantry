@@ -82,7 +82,10 @@ class Skill(BaseModel):
 
     model_config = ConfigDict(extra="ignore", validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("name", "namespace")(reject_newlines)
+    @field_validator("name", "namespace")
+    @classmethod
+    def _validate_newlines(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
     @property
     def qualified_name(self) -> str:
@@ -136,6 +139,7 @@ class Skill(BaseModel):
 
 
 class SkillSearchResult(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """Result from a skill search operation."""
 
     skill: Skill
@@ -149,6 +153,13 @@ class SkillRetrievalResult(BaseModel):
     total_count: int
     query_time_ms: float
     trace_id: str | None = None
+
+    model_config = ConfigDict(validate_assignment=True)
+
+    @field_validator("trace_id")
+    @classmethod
+    def _validate_newlines(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
     def to_prompt_injection(self, max_skills: int = 3) -> str:
         """

@@ -63,6 +63,7 @@ class ToolCapability(str, Enum):
 
 
 class ToolCost(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """Cost model for tool execution."""
 
     estimated_latency_ms: int = Field(default=100)
@@ -130,9 +131,10 @@ class ToolDefinition(BaseModel):
 
     model_config = ConfigDict(extra="ignore", validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("name", "version", "namespace")(
-        reject_newlines
-    )
+    @field_validator("name", "version", "namespace")
+    @classmethod
+    def _validate_newlines(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
     @field_validator("name")
     @classmethod
@@ -212,3 +214,10 @@ class ToolDependency(BaseModel):
     tool_name: str
     dependency_type: Literal["requires", "suggests", "conflicts"]
     reason: str | None = None
+
+    model_config = ConfigDict(validate_assignment=True)
+
+    @field_validator("tool_name")
+    @classmethod
+    def _validate_newlines(cls, v: str | None) -> str | None:
+        return reject_newlines(v)

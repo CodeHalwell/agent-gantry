@@ -15,6 +15,7 @@ from agent_gantry.schema.tool import ToolCapability, ToolDefinition, ToolSource
 
 
 class ConversationContext(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """
     Conversation state for context-aware routing.
 
@@ -47,6 +48,7 @@ class ConversationContext(BaseModel):
 
 
 class ToolQuery(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """Request to find relevant tools."""
 
     context: ConversationContext
@@ -84,6 +86,7 @@ class ToolQuery(BaseModel):
 
 
 class ScoredTool(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """A tool with its relevance scores."""
 
     tool: ToolDefinition
@@ -116,7 +119,10 @@ class RetrievalResult(BaseModel):
 
     model_config = ConfigDict(validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("trace_id")(reject_newlines)
+    @field_validator("trace_id")
+    @classmethod
+    def _validate_newlines(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
     def to_openai_tools(self) -> list[dict[str, Any]]:
         """

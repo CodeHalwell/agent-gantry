@@ -24,6 +24,7 @@ class MCPServerHealth(HealthMetrics):
 
 
 class MCPServerCost(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """Cost model for MCP server operations."""
 
     estimated_connection_latency_ms: int = Field(default=500)
@@ -95,7 +96,10 @@ class MCPServerDefinition(BaseModel):
 
     model_config = ConfigDict(extra="ignore", validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("name", "namespace")(reject_newlines)
+    @field_validator("name", "namespace")
+    @classmethod
+    def _validate_newlines(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
     @property
     def qualified_name(self) -> str:

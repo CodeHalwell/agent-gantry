@@ -24,10 +24,18 @@ class VectorStoreConfig(BaseModel):
     collection_name: str = "agent_gantry"
     dimension: int | None = None
     db_path: str | None = Field(default=None, description="Path to local database (for LanceDB)")
+
+    model_config = ConfigDict(validate_assignment=True)
+
+    @field_validator("collection_name")
+    @classmethod
+    def _validate_newlines(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
     options: dict[str, Any] = Field(default_factory=dict)
 
 
 class EmbedderConfig(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """Configuration for embedding backend."""
 
     type: Literal[
@@ -46,6 +54,7 @@ class EmbedderConfig(BaseModel):
 
 
 class RerankerConfig(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """Configuration for reranker backend."""
 
     enabled: bool = False
@@ -55,6 +64,7 @@ class RerankerConfig(BaseModel):
 
 
 class LLMConfig(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """Configuration for LLM-based features (intent classification, etc.)."""
 
     provider: Literal["openai", "anthropic", "google", "mistral", "groq"] = "openai"
@@ -70,6 +80,7 @@ class LLMConfig(BaseModel):
 
 
 class RoutingConfig(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """Configuration for semantic routing."""
 
     weights: dict[str, float] = Field(
@@ -100,8 +111,11 @@ class RateLimitConfig(BaseModel):
     per_tool: bool = Field(default=True, description="Rate limit per tool (vs. globally)")
     per_namespace: bool = Field(default=False, description="Rate limit per namespace")
 
+    model_config = ConfigDict(validate_assignment=True)
+
 
 class ExecutionConfig(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """Configuration for tool execution."""
 
     default_timeout_ms: int = 30000
@@ -123,6 +137,13 @@ class TelemetryConfig(BaseModel):
     expose_prometheus: bool = False
     prometheus_port: int = 9090
 
+    model_config = ConfigDict(validate_assignment=True)
+
+    @field_validator("service_name")
+    @classmethod
+    def _validate_newlines(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
+
 
 class MCPServerConfig(BaseModel):
     """Configuration for an MCP server to connect to."""
@@ -135,10 +156,14 @@ class MCPServerConfig(BaseModel):
 
     model_config = ConfigDict(validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("name", "namespace")(reject_newlines)
+    @field_validator("name", "namespace")
+    @classmethod
+    def _validate_newlines(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
 
 class MCPConfig(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """Configuration for MCP integration."""
 
     servers: list[MCPServerConfig] = Field(default_factory=list)
@@ -155,10 +180,14 @@ class A2AAgentConfig(BaseModel):
 
     model_config = ConfigDict(validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("name", "namespace")(reject_newlines)
+    @field_validator("name", "namespace")
+    @classmethod
+    def _validate_newlines(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
 
 class A2AConfig(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """Configuration for A2A integration."""
 
     agents: list[A2AAgentConfig] = Field(default_factory=list)
@@ -167,6 +196,7 @@ class A2AConfig(BaseModel):
 
 
 class AgentGantryConfig(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """
     Main configuration for Agent-Gantry.
 

@@ -14,7 +14,7 @@ from datetime import date, datetime, time
 from decimal import Decimal
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 logger = logging.getLogger(__name__)
 
@@ -372,6 +372,7 @@ def reject_newlines(value: str | None) -> str | None:
 
 
 class HealthMetrics(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
     """Runtime health fields shared by tools and MCP servers.
 
     Subclasses add the metrics specific to what they track (per-call latency
