@@ -51,9 +51,10 @@ class ToolCall(BaseModel):
 
     model_config = ConfigDict(validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("tool_name", "trace_id", "parent_span_id")(
-        reject_newlines
-    )
+    @field_validator("tool_name", "trace_id", "parent_span_id")
+    @classmethod
+    def _reject_newline_identifiers(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
 
 class ToolResult(BaseModel):
@@ -77,9 +78,10 @@ class ToolResult(BaseModel):
 
     model_config = ConfigDict(validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("tool_name", "trace_id", "span_id")(
-        reject_newlines
-    )
+    @field_validator("tool_name", "trace_id", "span_id")
+    @classmethod
+    def _reject_newline_identifiers(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
     @property
     def latency_ms(self) -> float:

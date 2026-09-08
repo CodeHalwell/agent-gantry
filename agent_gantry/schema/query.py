@@ -116,7 +116,10 @@ class RetrievalResult(BaseModel):
 
     model_config = ConfigDict(validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("trace_id")(reject_newlines)
+    @field_validator("trace_id")
+    @classmethod
+    def _reject_newline_identifiers(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
     def to_openai_tools(self) -> list[dict[str, Any]]:
         """
