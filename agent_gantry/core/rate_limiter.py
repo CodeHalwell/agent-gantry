@@ -187,13 +187,22 @@ class RateLimiter:
             minute_ago = now - 60
             # Counted rather than pruned: pruning is a mutation, and this must
             # leave the limiter exactly as it found it.
-            in_hour = sum(1 for stamp in history if stamp >= hour_ago)
+
+            in_hour = 0
+            in_minute = 0
+            for stamp in reversed(history):
+                if stamp >= hour_ago:
+                    in_hour += 1
+                    if stamp >= minute_ago:
+                        in_minute += 1
+                else:
+                    break
+
             if in_hour >= self._config.max_calls_per_hour:
                 return (
                     f"Rate limit exceeded: {in_hour}/"
                     f"{self._config.max_calls_per_hour} calls per hour"
                 )
-            in_minute = sum(1 for stamp in history if stamp >= minute_ago)
             if in_minute >= self._config.max_calls_per_minute:
                 return (
                     f"Rate limit exceeded: {in_minute}/"
