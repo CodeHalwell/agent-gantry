@@ -58,3 +58,7 @@
 ## 2026-08-25 - Avoid row-wise dictionary allocation with LanceDB to_list for single columns
 **Learning:** When retrieving a single column (like JSON strings) from LanceDB, using `.to_list()` allocates a dictionary for every row just to wrap the single field, causing O(N) memory overhead and slower execution on large tables.
 **Action:** Use columnar extraction via `.select(['col']).to_arrow()` and then extract the list of values directly using `table['col'].to_pylist()`. This avoids dictionary allocation per row.
+
+## 2026-08-29 - Avoid row-wise dictionary allocation with LanceDB to_list for single columns
+**Learning:** When retrieving single columns or just a few columns from LanceDB, using `.to_list()` allocates a dictionary for every row just to wrap the fields, causing memory overhead on large tables. This memory footprint can be massive, impacting not only Python's garbage collection but slowing iteration significantly.
+**Action:** Replaced `.to_list()` calls with `.select(...).to_arrow()` and then extracted values via `.to_pylist()` on the specific columns to prevent O(N) dict allocations.
