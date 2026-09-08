@@ -95,7 +95,10 @@ class MCPServerDefinition(BaseModel):
 
     model_config = ConfigDict(extra="ignore", validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("name", "namespace")(reject_newlines)
+    @field_validator("name", "namespace")
+    @classmethod
+    def _reject_newline_identifiers(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
     @property
     def qualified_name(self) -> str:

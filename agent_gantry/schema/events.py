@@ -30,7 +30,10 @@ class RetrievalEvent(BaseModel):
 
     model_config = ConfigDict(validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("trace_id")(reject_newlines)
+    @field_validator("trace_id")
+    @classmethod
+    def _reject_newline_identifiers(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
 
 class ExecutionEvent(BaseModel):
@@ -48,9 +51,10 @@ class ExecutionEvent(BaseModel):
 
     model_config = ConfigDict(validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("trace_id", "span_id", "tool_name")(
-        reject_newlines
-    )
+    @field_validator("trace_id", "span_id", "tool_name")
+    @classmethod
+    def _reject_newline_identifiers(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
 
 class HealthChangeEvent(BaseModel):
@@ -64,7 +68,10 @@ class HealthChangeEvent(BaseModel):
 
     model_config = ConfigDict(validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("tool_name")(reject_newlines)
+    @field_validator("tool_name")
+    @classmethod
+    def _reject_newline_identifiers(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
 
 class TokenUsageEvent(BaseModel):
@@ -84,4 +91,7 @@ class TokenUsageEvent(BaseModel):
 
     model_config = ConfigDict(validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("trace_id")(reject_newlines)
+    @field_validator("trace_id")
+    @classmethod
+    def _reject_newline_identifiers(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
