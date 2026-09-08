@@ -117,3 +117,6 @@
 ## 2026-08-20 - [Spatial Visual Context for Active Links]
 **Learning:** When sidebar navigation links indicate their active state only by changing text color and font weight, the change may be too subtle for users with low vision or cognitive impairments to quickly locate their current page within a dense menu. Sighted users benefit from a clear, spatial visual indicator (like a background block) corresponding to the `aria-current` state.
 **Action:** When implementing navigation links with `aria-current="page"`, always provide a strong spatial visual state (e.g., adding `background: var(--panel2)`) alongside text changes to ensure clear spatial context for sighted users.
+## 2026-08-29 - ARIA Tablist Keyboard Navigation
+**Learning:** Implementing `role="tablist"` requires explicit keyboard navigation (Arrow keys) and managing `tabIndex` to allow users to smoothly switch tabs, as screen readers and keyboard users rely on this behavior.
+**Action:** Always add keyboard event handlers and dynamic `tabIndex` management when building custom tab components.
