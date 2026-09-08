@@ -58,3 +58,7 @@
 ## 2026-08-25 - Avoid row-wise dictionary allocation with LanceDB to_list for single columns
 **Learning:** When retrieving a single column (like JSON strings) from LanceDB, using `.to_list()` allocates a dictionary for every row just to wrap the single field, causing O(N) memory overhead and slower execution on large tables.
 **Action:** Use columnar extraction via `.select(['col']).to_arrow()` and then extract the list of values directly using `table['col'].to_pylist()`. This avoids dictionary allocation per row.
+
+## 2026-08-31 - Fast reverse iteration for sorted sliding windows in SecurityPolicy
+**Learning:** Using a generator expression inside sum() to count recent timestamps (e.g. sum(1 for stamp in history if now - stamp < 60)) iterates the entire history, causing O(N) overhead. Since the history is chronologically sorted, reversing the iteration and breaking early when the condition is met provides significant speedup for large sliding windows.
+**Action:** Replace generator expressions with an inline for loop over `reversed(history)` and break early when evaluating sorted chronologies.
