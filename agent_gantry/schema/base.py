@@ -244,7 +244,11 @@ def null_validates_against(schema: Any) -> bool:
             return False
     one_of = schema.get("oneOf")
     if isinstance(one_of, list) and one_of:
-        if sum(1 for branch in one_of if null_validates_against(branch)) != 1:
+        matches = 0
+        for branch in one_of:
+            if null_validates_against(branch):
+                matches += 1
+        if matches != 1:
             return False
     all_of = schema.get("allOf")
     if isinstance(all_of, list) and all_of:
