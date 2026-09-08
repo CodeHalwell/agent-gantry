@@ -130,9 +130,10 @@ class ToolDefinition(BaseModel):
 
     model_config = ConfigDict(extra="ignore", validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("name", "version", "namespace")(
-        reject_newlines
-    )
+    @field_validator("name", "version", "namespace")
+    @classmethod
+    def _validate_newlines(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
     @field_validator("name")
     @classmethod

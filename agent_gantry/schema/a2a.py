@@ -28,7 +28,10 @@ class AgentSkill(BaseModel):
 
     model_config = ConfigDict(extra="ignore", validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("id", "name")(reject_newlines)
+    @field_validator("id", "name")
+    @classmethod
+    def _validate_newlines(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
 
 class AgentCard(BaseModel):
@@ -49,7 +52,10 @@ class AgentCard(BaseModel):
 
     model_config = ConfigDict(extra="ignore", validate_assignment=True)
 
-    _reject_newline_identifiers = field_validator("name")(reject_newlines)
+    @field_validator("name")
+    @classmethod
+    def _validate_newlines(cls, v: str | None) -> str | None:
+        return reject_newlines(v)
 
     authentication: dict[str, Any] | None = Field(
         default=None, description="Authentication configuration"

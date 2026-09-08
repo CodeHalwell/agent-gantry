@@ -94,3 +94,7 @@
 **Vulnerability:** Execution and event models lack newline validation on identifier fields.
 **Learning:** Identifier sanitization needs to be universally applied to all schema models to avoid CRLF injection.
 **Prevention:** Implement reject_newlines field_validator and validate_assignment=True on all schemas.
+## 2026-09-03 - Prevent Pydantic V2 @field_validator State Mutation
+**Vulnerability:** Pydantic V2 allows decorators like `@field_validator` to mutate the global state of a shared imported function when applied directly (e.g., `_val = field_validator('field')(shared_func)`). This causes validation errors across different models sharing the same function, leading to potentially bypassed validations or unexpected runtime crashes.
+**Learning:** In Pydantic V2, validation functions applied via `@field_validator` without a wrapping `@classmethod` inside the target model will have their internal `__pydantic_core_schema__` modified to only apply to the fields specified in the most recently parsed model, corrupting the validation for previously parsed models.
+**Prevention:** Always define a `@classmethod` within the target model that wraps and calls the shared validation function, ensuring that the `@field_validator` decorator is strictly above the `@classmethod` decorator to preserve correct behavior and prevent global state mutation.
